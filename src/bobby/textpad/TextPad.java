@@ -27,7 +27,6 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.awt.event.KeyAdapter;
 
 public class TextPad {
 

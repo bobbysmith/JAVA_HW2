@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,10 +18,10 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.BorderLayout;
-import java.awt.Component;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 
 public class TaskList {
 
@@ -48,6 +50,8 @@ public class TaskList {
 		frame.setTitle("Task List");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		JTree tree = new JTree();
+		
 		DefaultMutableTreeNode priority1 = new DefaultMutableTreeNode("Priority 1");
 		DefaultMutableTreeNode priority2 = new DefaultMutableTreeNode("Priority 2");
 		DefaultMutableTreeNode priority3 = new DefaultMutableTreeNode("Priority 3");
@@ -59,29 +63,24 @@ public class TaskList {
 		DefaultMutableTreeNode priority9 = new DefaultMutableTreeNode("Priority 9");
 		DefaultMutableTreeNode priority10 = new DefaultMutableTreeNode("Priority 10");
 		
-		JTree tree = new JTree();
-		tree.setModel(new DefaultTreeModel(
-			new DefaultMutableTreeNode("Task List") {
-				private static final long serialVersionUID = 1L;
-
-				{
-					add(priority1);
-					add(priority2);
-					add(priority3);
-					add(priority4);
-					add(priority5);
-					add(priority6);
-					add(priority7);
-					add(priority8);
-					add(priority9);
-					add(priority10);
-//					for (int i = 1; i <= 10; i++) {
-//						priority = new DefaultMutableTreeNode("Priority " + i);
-//						add(priority);
-//					}
-				}
+		
+		DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode("Task List") {
+			{
+				add(priority1);
+				add(priority2);
+				add(priority3);
+				add(priority4);
+				add(priority5);
+				add(priority6);
+				add(priority7);
+				add(priority8);
+				add(priority9);
+				add(priority10);
 			}
-		));
+		});
+		
+		tree.setModel(model);
+		
 		frame.getContentPane().add(tree, BorderLayout.NORTH);
 		
 		JScrollPane scrollPane = new JScrollPane(tree);
@@ -108,42 +107,53 @@ public class TaskList {
 		taskPanel.add(editButton);
 		taskPanel.add(deleteButton);
 		
+		
 		/* ADD */
 		addButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				MutableTreeNode newTask = new DefaultMutableTreeNode(taskText.getText());
+				DefaultMutableTreeNode newTask = new DefaultMutableTreeNode(taskText.getText());
                 System.out.println(priorityText.getText());
                 switch(priorityText.getText()) {
                 	case "1":
                 		priority1.add(newTask);
+                		tree.repaint();
                 		break;
                 	case "2":
                 		priority2.add(newTask);
+                		tree.repaint();
                 		break;
 	                case "3":
 	                	priority3.add(newTask);
+	                	tree.repaint();
 	            		break;
 	            	case "4":
 	            		priority4.add(newTask);
+	            		tree.repaint();
 	            		break;
 	                case "5":
 	                	priority5.add(newTask);
+	                	tree.repaint();
 	            		break;
 	            	case "6":
 	            		priority6.add(newTask);
+	            		tree.repaint();
 	            		break;
 	                case "7":
 	                	priority7.add(newTask);
+	                	tree.repaint();
 	            		break;
 	            	case "8":
 	            		priority8.add(newTask);
+	            		tree.repaint();
 	            		break;
 	                case "9":
 	                	priority9.add(newTask);
+	                	tree.repaint();
 	            		break;
 	            	case "10":
 	            		priority10.add(newTask);
+	            		tree.repaint();
 	            		break;
                 	default:
                 		JOptionPane.showMessageDialog(frame, "Please enter a number 1 through 10.");
@@ -154,13 +164,73 @@ public class TaskList {
 	    });
 		
 		/* EDIT */
+		/* getting the task and priority of the selected node when you click edit and populating the
+		 * corresponding text fields with those values
+		 * trying to then add the edited node to its new priority and delete the old one when add is clicked again
+		 */
 		editButton.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DefaultMutableTreeNode selectedNode = 
-					       (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-				System.out.println(selectedNode);
-				priority1.remove(selectedNode);
+				DefaultMutableTreeNode editedTask = new DefaultMutableTreeNode(taskText.getText());
+				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+				MutableTreeNode parent = (MutableTreeNode) (selected.getParent());
+				taskText.setText(selected.toString());
+				priorityText.setText(parent.toString().replaceAll("[^0-9]",""));
+				
+				addButton.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+					
+						selected.removeFromParent();
+			            
+						switch(priorityText.getText()) {
+	                	case "1":
+	                		priority1.add(editedTask);
+	                		tree.repaint();
+	                		break;
+	                	case "2":
+	                		priority2.add(editedTask);
+	                		tree.repaint();
+	                		break;
+		                case "3":
+		                	priority3.add(editedTask);
+		                	tree.repaint();
+		            		break;
+		            	case "4":
+		            		priority4.add(editedTask);
+		            		tree.repaint();
+		            		break;
+		                case "5":
+		                	priority5.add(editedTask);
+		                	tree.repaint();
+		            		break;
+		            	case "6":
+		            		priority6.add(editedTask);
+		            		tree.repaint();
+		            		break;
+		                case "7":
+		                	priority7.add(editedTask);
+		                	tree.repaint();
+		            		break;
+		            	case "8":
+		            		priority8.add(editedTask);
+		            		tree.repaint();
+		            		break;
+		                case "9":
+		                	priority9.add(editedTask);
+		                	tree.repaint();
+		            		break;
+		            	case "10":
+		            		priority10.add(editedTask);
+		            		tree.repaint();
+		            		break;
+	                	default:
+	                		JOptionPane.showMessageDialog(frame, "Please enter a number 1 through 10.");
+	                		break;
+						}
+				        
+					}
+				});
 			}
 		});
 		
@@ -169,15 +239,22 @@ public class TaskList {
 		deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String regex = "(Priority \\d)";
+			    Pattern p = Pattern.compile(regex);
+				TreePath currentSelection = tree.getSelectionPath();
+				if (currentSelection != null) {
+					DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+		            MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
+		            Matcher match = p.matcher(parent.toString());
+		            // only deletes tasks, not priority nodes
+		            if (match.matches()) {
+		            	model.removeNodeFromParent(currentNode);
+		            } else {
+		            	JOptionPane.showMessageDialog(frame, "You cannot delete a Priority node.");
+		            }
+				}
 			}
 		});
-		
-//		tree.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseClicked(MouseEvent e) {
-//				System.out.println(e);		
-//			}
-//		});
 		
 	}
 
